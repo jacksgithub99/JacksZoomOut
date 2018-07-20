@@ -9,6 +9,9 @@ import UIKit
  2.通过superView.insertSubview(zView, belowSubview: self.replaceView) 和 superView.insertSubview(replaceView, aboveSubview: zView)
  保证查看结束后，zView可以恢复原来在父视图中的对应层级（与兄弟视图之间的层级）
  3.目前只实现了一次查看一张图片（View）。
+ 4.~~~~~~~~~~~~~
+ 注意，如果如果被放大的视图showView内部有subviews，那么其subviews的布局是未知的（不符合期望的）
+ ~~~~~~~~~~~~~~~
  */
 
 typealias jacksZoomManagerCallback = () -> Void
@@ -18,8 +21,6 @@ class JKZoomViewsManager: NSObject {
     static let zoomViewsManager = JKZoomViewsManager()
     
     class var sharedInstance: JKZoomViewsManager {
-        zoomViewsManager.replaceView.backgroundColor = UIColor.clear
-        zoomViewsManager.contentView.backgroundColor = UIColor.black
         return zoomViewsManager
     }
     
@@ -38,6 +39,11 @@ class JKZoomViewsManager: NSObject {
     
     override init() {
         super.init()
+        
+        replaceView.backgroundColor = UIColor.clear
+        contentView.backgroundColor = UIColor.black
+        contentView.accessibilityIdentifier = "jk_zoom_content_id"  //单元测试UITest用到
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(contentViewTap))
         contentView.addGestureRecognizer(tap)
     }
